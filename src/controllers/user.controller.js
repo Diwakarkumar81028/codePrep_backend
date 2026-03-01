@@ -3,7 +3,20 @@ import {apierror} from "../utils/apierror.js"
 import {apiresponse} from "../utils/apiresponse.js"
 import { User } from "../models/user.model.js";
 import validator from "validator"
+import {cloudinary_upload} from "../utils/cloudinary.js"
 
+async function generateAccessRefreshToken(id) {
+    const user=await User.findById(id);
+    const accessToken=user.generateAccessToken();
+    const refreshToken=user.generateRefreshToken();
+    //save refresh token to db
+    user.refreshToken=refreshToken;
+    await user.save({validateBeforeSave:false});
+    //
+    return {accessToken,refreshToken}
+}
+
+//1.register 
 async function registerUser(req,res) {
     //1. take data from user--> username,email,fullname...  from user .model.js
     //2. validation -> not  empty
@@ -72,3 +85,54 @@ async function registerUser(req,res) {
    )
 }
 export {registerUser}
+
+//2.login
+async function loginUser(req,res) {
+    //1. get data;
+    const {username,email,password}=req.body;
+    if(!username && !email){
+        throw new apierror(400,"username or email is required");
+    }
+    if(!password) {
+        throw new apierror(400,"password is required");
+    }
+    //2.check user exist or not
+    const user=await User.findOne({
+        $or:[{username},{email}]
+    });
+    if(!user) {
+        throw new apierror(400,"user not registered")
+    }
+    //3.validate password
+    const validpassword=await user.isPasswordCorrect(password);
+    if(!validpassword) {
+        throw new apierror(400,"incorrect password")
+    }
+    //4.
+   const {accessToken,refreshToken}=await generateAccessRefreshToken(user._id);
+   //5.
+     const loggedInUser=await User.findById(user._id).select(
+     "-password -refreshToken"
+    )
+   //6.cookies
+    //by default any one can modify the cookies on frontend;
+    const options={
+     httpOnly:true,// modifiable only by server not by frontend
+     secure:true//-->
+    }
+    //res
+    return res.status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+     new apiresponse(
+         200,
+         {
+            user:loggedInUser,accessToken,refreshToken 
+         },
+         "User logged In Successfully"
+   )
+   )
+}
+
+export {loginUser}
