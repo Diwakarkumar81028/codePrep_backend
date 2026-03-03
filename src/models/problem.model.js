@@ -1,0 +1,73 @@
+import mongoose, { Schema } from "mongoose";
+
+const problemSchema=new mongoose.Schema(
+    {
+        title:{
+            type:String,
+            required:true,
+        },
+        description:{
+            type:String,
+            required:true,
+        },
+        difficulty:{
+            type:String,
+            enum:['easy','medium','hard'],
+            required:true,
+        },
+        tags:{
+            type:String,
+            enum:['Array','Linkedlist','Graph','Tree','Dp'],
+            required:true
+        },
+        visibleTestCases:[
+            {
+                input:{
+                    type:String,
+                    required:true,
+                },
+                output:{
+                    type:String,
+                    required:true,
+                },
+                explanation:{
+                    type:String,
+                    required:true
+                }
+            }
+        ],
+        hiddenTestCaes:[
+            {
+                input:{
+                    type:String,
+                    required:true,
+                },
+                output:{
+                    type:String,
+                    required:true,
+                },
+            }
+        ],
+        startCode:[
+            {
+                language:{
+                    type:String,
+                    required:true,
+                },
+                intitalCode:{
+                    type:String,
+                    required:true
+                }
+            }
+        ],
+        problemCreator:{
+            type:Schema.Types.ObjectId,
+            ref:"User",
+            required:true
+        },
+
+    },
+    {timestamps:true}
+)
+
+export const Problem=mongoose.model("Problem",problemSchema);
