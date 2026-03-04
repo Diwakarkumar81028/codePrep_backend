@@ -36,7 +36,7 @@ const problemSchema=new mongoose.Schema(
                 }
             }
         ],
-        hiddenTestCaes:[
+        hiddenTestCases:[
             {
                 input:{
                     type:String,
@@ -65,6 +65,18 @@ const problemSchema=new mongoose.Schema(
             ref:"User",
             required:true
         },
+        refrenceSolution:[
+            {
+                language:{
+                    type:String,
+                    required:true,
+                },
+                completeCode:{
+                    type:String,
+                    required:true
+                }
+            }
+        ],
 
     },
     {timestamps:true}

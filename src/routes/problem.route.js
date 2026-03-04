@@ -1,11 +1,12 @@
 
 import { Router } from "express";
 import { verifyAdmin } from "../middlewares/verifyadmin.middleware.js";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { createProblem } from "../controllers/problem.controller.js";
 
 const router=Router();
 //1. create
-router.route('/create').post(verifyAdmin)
+router.route('/create').post(verifyAdmin,createProblem)
 
 //2.fetch
 router.route('/:id').get(verifyJWT,)

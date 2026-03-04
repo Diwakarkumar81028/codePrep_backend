@@ -18,8 +18,13 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
 
-//ROUTING
+//user ROUTING
 import userRouter from "./routes/user.route.js"
-app.use("/api/v1/user",userRouter)
+app.use("/api/v1/user",userRouter);
 
+//problem routing
+import problemRouter from "./routes/problem.route.js"
+app.use("/api/v1/problem",problemRouter)
+
+//
 export default app;
