@@ -143,3 +143,45 @@ async function deleteProblem(req,res) {
  }
 }
 export {deleteProblem}
+
+//4. get problem by id
+async function getProblemById(req,res) {
+    //1.verify loggedin user
+    //2.id
+    const {id}=req.params;
+    if(!id) {
+        throw new apierror(400,"Invalid problem id")
+    }
+    //fetch
+    const Dsaproblem=await Problem.findById(id);
+    if(!Dsaproblem){
+        throw new apierror(400,"Invalid problem id")
+    }
+    //res
+    return res.status(200)
+    .json(
+        new apiresponse(200,Dsaproblem,"Problem fetched successfully")
+    )
+
+}
+export{getProblemById}
+
+//5. get all problem
+async function getAllProblem(req,res) {
+    //1.verify user
+    try{
+        const problems=await Problem.find({});
+        if(!problems){
+            throw new apierror(500,"Problem not fetched")
+        }
+        return res.status(200)
+        .json(
+            new apiresponse(200,problems,"All problem fetched successfully")
+        )
+    }
+    catch(err){
+     throw new apierror(500,"Problem not fetched")
+    }
+}
+
+export{getAllProblem}
