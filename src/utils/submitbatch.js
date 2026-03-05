@@ -7,7 +7,7 @@ async function submitBatch(submissions) {
     method: 'POST',
     url: 'https://judge0-ce.p.rapidapi.com/submissions/batch',
     params: {
-        base64_encoded: 'true'
+        base64_encoded: 'false'
     },
     headers: {
         'x-rapidapi-key': 'd0a9875736msh06989435b077922p1df3b4jsnff8f2f60b207',

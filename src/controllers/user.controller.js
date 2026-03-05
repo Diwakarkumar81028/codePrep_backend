@@ -75,7 +75,7 @@ async function registerUser(req,res) {
     email,
     password,
     username,
-    role
+    role:req.body.role
    })
    //
     const createdUser=await User.findById(user._id).select(
@@ -237,7 +237,7 @@ async function registerAdmin(req,res) {
     email,
     password,
     username,
-    role
+    role:req.body.role
    })
    //
     const createdUser=await User.findById(user._id).select(
@@ -248,7 +248,7 @@ async function registerAdmin(req,res) {
    }
    //
     return res.status(201).json(
-    new apiresponse(200,createdUser,"User registred Successfully")
+    new apiresponse(200,createdUser,"Admim registred Successfully")
    )
 }
 export {registerAdmin}
