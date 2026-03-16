@@ -8,59 +8,78 @@ import { Problem } from "../models/problem.model.js";
 //1. create problem
 async function createProblem(req,res) {
  try {
-       //1. authenticate admin--> middleware
-       //2.create problem
-       const {title,description,difficulty,
-           tags,visibleTestCases,
-           hiddenTestCases,startCode,
-           refrenceSolution,problemCreator}=req.body;
-   
-       //3.check refrence solution is correct or not;
-        for(const {language,completeCode} of refrenceSolution){
-           //code ,lang_id,input,output
-   
-           //creating batch-->submission array 
-           const languageId=getLanguageId(language);
-           const submissions=visibleTestCases.map((obj,index)=>({
-               source_code:completeCode,
-               language_id:languageId,
-               stdin:obj.input,
-               expected_output:obj.output
-           }))
-           //create a batch--> tokens
-          const submitResult=await submitBatch(submissions);
-          //send tokens--> for result(status_id)
-          const resultToken=submitResult.map((obj)=>obj.token);
-          //submit that token--> give a object of submissions
-          const testResult=await submitToken(resultToken);
-          //
-          for(const obj of testResult){
-           if(obj.status_id!=3){
-               return new apiresponse(400,{},"Error occured while creating the problem");
+
+   const {
+     title,
+     description,
+     difficulty,
+     tags,
+     visibleTestCases,
+     hiddenTestCases,
+     startCode,
+     referenceSolution
+   } = req.body;
+
+
+   for(const {language,completeCode} of referenceSolution){
+
+      const languageId = getLanguageId(language);
+
+      const submissions = visibleTestCases.map((obj)=>({
+         source_code:completeCode,
+         language_id:languageId,
+         stdin:obj.input,
+         expected_output:obj.output
+      }));
+
+       //1.submit batch and got token
+       const submitResult = await submitBatch(submissions);
+       const resultToken = submitResult.map((obj)=>obj.token);
+       //
+        await new Promise(res => setTimeout(res,2000));
+       //2. submit token and get status id;
+       const testResult = await submitToken(resultToken);
+
+
+        for(const obj of testResult){
+           if(obj.status.id != 3){
+              throw new apierror(400,"refrence solution is wrong not getting status id 3")
            }
-          }
         }
-   
-        //4.create the problem store it in db;
-       const newproblem= await Problem.create({
-          ...req.body,
-          problemCreator:req.user._id
-        })
-   
-        return res.status(201)
-        .json(
-           new apiresponse(201,newproblem,"problem created sucessfully")
-        )
+   }
+
+    const newproblem = await Problem.create({
+        title,
+        description,
+        difficulty,
+        tags,
+        visibleTestCases,
+        hiddenTestCases,
+        startCode,
+        referenceSolution,
+        problemCreator:req.user._id 
+     });
+     
+
+    const createdproblem=await Problem.findById(newproblem._id).select(
+        "-hiddenTestCases"
+    )
+    //
+   return res.status(201).json(
+      new apiresponse(201,createdproblem,"problem created successfully")
+   );
+
  } catch (error) {
-    throw new apierror(400,"error while creating the problem")
+   throw new apierror(400,"error while creating the problem");
  }
 }
 export {createProblem};
 
+
 //2.update problem
 async function updateProblem(req,res) {
     //1.verify admin
-    //2.
+    //2.problem_id by admin --> which have to update
     const {id}=req.params;
     if(!id) {
         throw new apierror(400,"Invalid problem id")
@@ -70,43 +89,47 @@ async function updateProblem(req,res) {
         throw new apierror(400,"Invalid problem id")
     }
     //3.data from body
-try {
+    try {
         const {title,description,difficulty,
         tags,visibleTestCases,
         hiddenTestCases,startCode,
-        refrenceSolution,problemCreator}=req.body;
+        referenceSolution,problemCreator}=req.body;
        //4.check refrence solution is correct or not;
-        for(const {language,completeCode} of refrenceSolution){
-            //code ,lang_id,input,output
-       
-            //creating batch-->submission array 
-            const languageId=getLanguageId(language);
-            const submissions=visibleTestCases.map((obj,index)=>({
-                source_code:completeCode,
-                language_id:languageId,
-                stdin:obj.input,
-                expected_output:obj.output
-            }))
-            //create a batch--> tokens
-            const submitResult=await submitBatch(submissions);
-            //send tokens--> for result(status_id)
-            const resultToken=submitResult.map((obj)=>obj.token);
-            //submit that token--> give a object of submissions
-            const testResult=await submitToken(resultToken);
-            //
-            for(const obj of testResult){
-               if(obj.status_id!=3){
-                return new apiresponse(400,{},"Error occured while creating the problem");
-             }
-            }
+     for(const {language,completeCode} of referenceSolution){
+
+      const languageId = getLanguageId(language);
+
+      const submissions = visibleTestCases.map((obj)=>({
+         source_code:completeCode,
+         language_id:languageId,
+         stdin:obj.input,
+         expected_output:obj.output
+      }));
+
+       //1.submit batch and got token
+       const submitResult = await submitBatch(submissions);
+       const resultToken = submitResult.map((obj)=>obj.token);
+       //
+        await new Promise(res => setTimeout(res,2000));
+       //2. submit token and get status id;
+       const testResult = await submitToken(resultToken);
+
+
+        for(const obj of testResult){
+           if(obj.status.id != 3){
+              throw new apierror(400,"refrence solution is wrong not getting status id 3")
+           }
         }
+      }
         //5.update
       const newproblem= await Problem.findByIdAndUpdate(id,{...req.body},{runValidators:true,new:true});
-        
+      const updatedproblem=await Problem.findById(newproblem._id).select(
+        "-hiddenTestCases"
+      )  
       //6.
       return res.status(200).
       json(
-        new apiresponse(200,{},"Problem updated successfully")
+        new apiresponse(200,updatedproblem,"Problem updated successfully")
       )
 } catch (error) {
     throw new apierror(500,"something wrong while updating the problem")
@@ -144,6 +167,9 @@ async function deleteProblem(req,res) {
 }
 export {deleteProblem}
 
+
+/////////////////////////
+///////////////////////////
 //4. get problem by id
 async function getProblemById(req,res) {
     //1.verify loggedin user
@@ -153,7 +179,9 @@ async function getProblemById(req,res) {
         throw new apierror(400,"Invalid problem id")
     }
     //fetch
-    const Dsaproblem=await Problem.findById(id);
+    const Dsaproblem=await Problem.findById(id).select(
+        "-problemCreator -hiddenTestCases"
+    );
     if(!Dsaproblem){
         throw new apierror(400,"Invalid problem id")
     }
@@ -169,9 +197,12 @@ export{getProblemById}
 //5. get all problem
 async function getAllProblem(req,res) {
     //1.verify user
+    //2.
     try{
-        const problems=await Problem.find({});
-        if(!problems){
+        const problems=await Problem.find({}).select(
+            "title difficulty tags _id"
+        );
+        if(problems.length==0){
             throw new apierror(500,"Problem not fetched")
         }
         return res.status(200)
@@ -185,3 +216,10 @@ async function getAllProblem(req,res) {
 }
 
 export{getAllProblem}
+
+//6.problem solved by user
+async function problemSolvedByUser(req,res) {
+    //1.authentication;
+    //2.
+}
+export {problemSolvedByUser}

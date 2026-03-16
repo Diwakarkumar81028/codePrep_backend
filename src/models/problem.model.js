@@ -54,7 +54,7 @@ const problemSchema=new mongoose.Schema(
                     type:String,
                     required:true,
                 },
-                intitalCode:{
+                initialCode:{
                     type:String,
                     required:true
                 }
@@ -65,7 +65,7 @@ const problemSchema=new mongoose.Schema(
             ref:"User",
             required:true
         },
-        refrenceSolution:[
+        referenceSolution:[
             {
                 language:{
                     type:String,
