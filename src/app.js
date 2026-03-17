@@ -26,5 +26,7 @@ app.use("/api/v1/user",userRouter);
 import problemRouter from "./routes/problem.route.js"
 app.use("/api/v1/problem",problemRouter)
 
-//
+//submission rouitng
+import submissionRouter from "./routes/submission.route.js"
+app.use("/api/v1/submission",submissionRouter)
 export default app;

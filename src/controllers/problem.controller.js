@@ -40,7 +40,8 @@ async function createProblem(req,res) {
        //2. submit token and get status id;
        const testResult = await submitToken(resultToken);
 
-
+       console.log(testResult);
+       break;
         for(const obj of testResult){
            if(obj.status.id != 3){
               throw new apierror(400,"refrence solution is wrong not getting status id 3")

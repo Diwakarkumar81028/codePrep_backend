@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const submitScehma=new mongoose.Schema(
+const submissionScehma=new mongoose.Schema(
     {
        userId:{
         type:Schema.Types.ObjectId,
@@ -50,4 +50,4 @@ const submitScehma=new mongoose.Schema(
     {timestamps:true}
 )
 
-export const Submit=mongoose.model("Submit",submitScehma);
+export const Submission=mongoose.model("Submission",submissionScehma);
