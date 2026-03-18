@@ -24,7 +24,7 @@ router.route('/get/:id').get(verifyJWT,getProblemById)
 //5.fetch all problem
 router.route('/getall').get(verifyJWT,getAllProblem);
 
-//6.
+//6.problem solved by user
 router.route("/solvedByUser").get(verifyJWT,problemSolvedByUser);
 
 export default router;

@@ -42,7 +42,12 @@ const userSchema=new Schema({
     default:"user"
    },
    problemSolved:{
-    type:[String],
+    type:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:"Problem"
+        }
+    ],
    },
     password:{
         type:String,

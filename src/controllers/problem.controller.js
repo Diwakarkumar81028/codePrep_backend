@@ -4,6 +4,7 @@ import { submitToken } from "../utils/sumitToken.js";
 import { apierror } from "../utils/apierror.js";
 import { apiresponse } from "../utils/apiresponse.js";
 import { Problem } from "../models/problem.model.js";
+import { User } from "../models/user.model.js";
 
 //1. create problem
 async function createProblem(req,res) {
@@ -40,7 +41,7 @@ async function createProblem(req,res) {
        //2. submit token and get status id;
        const testResult = await submitToken(resultToken);
 
-       console.log(testResult);
+    //    console.log(testResult);
        break;
         for(const obj of testResult){
            if(obj.status.id != 3){
@@ -222,5 +223,16 @@ export{getAllProblem}
 async function problemSolvedByUser(req,res) {
     //1.authentication;
     //2.
+    // const count=req.user.problemSolved.length;
+    const userId=req.user._id;
+    const user=await User.findById(userId).populate({
+        path:"problemSolved",
+        select:"_id title difficulty tags"
+    })
+
+    return res.status(200)
+        .json(
+            new apiresponse(200,user.problemSolved,"All problem solved by user fetched successfully")
+        )
 }
 export {problemSolvedByUser}
