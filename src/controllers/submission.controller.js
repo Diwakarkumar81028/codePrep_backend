@@ -55,7 +55,7 @@ async function submitProblem(req,res) {
         //3.submitted result ko update
         let right=0,wrong=0;
         let memory=0,runtime=0;
-        let errormessage=null;
+        let errormessage="null";
         let status="";
         for(const obj of testResult){
             //accepted
@@ -81,6 +81,7 @@ async function submitProblem(req,res) {
          
          await submittedResult.save({validateBeforeSave:false});
         //  console.log(submittedResult);
+        
         //insert into userschema if problem solved successfully
         if(status=="Accepted"){
             const user=await User.findById(userId);

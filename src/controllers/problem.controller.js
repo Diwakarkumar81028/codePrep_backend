@@ -8,8 +8,9 @@ import { User } from "../models/user.model.js";
 
 //1. create problem
 async function createProblem(req,res) {
+//1. verify admin    
  try {
-
+//2. get Problem info-->req.body;    
    const {
      title,
      description,
@@ -21,11 +22,11 @@ async function createProblem(req,res) {
      referenceSolution
    } = req.body;
 
-
+//3. verigy refrence solution is true or not    
    for(const {language,completeCode} of referenceSolution){
 
       const languageId = getLanguageId(language);
-
+      //create submission array for judge0
       const submissions = visibleTestCases.map((obj)=>({
          source_code:completeCode,
          language_id:languageId,
@@ -42,7 +43,6 @@ async function createProblem(req,res) {
        const testResult = await submitToken(resultToken);
 
     //    console.log(testResult);
-       break;
         for(const obj of testResult){
            if(obj.status.id != 3){
               throw new apierror(400,"refrence solution is wrong not getting status id 3")
