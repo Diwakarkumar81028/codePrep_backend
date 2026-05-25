@@ -5,6 +5,7 @@ import { apierror } from "../utils/apierror.js";
 import { apiresponse } from "../utils/apiresponse.js";
 import { Problem } from "../models/problem.model.js";
 import { User } from "../models/user.model.js";
+import { Submission } from "../models/submission.model.js";
 
 //1. create problem
 async function createProblem(req,res) {
@@ -236,3 +237,31 @@ async function problemSolvedByUser(req,res) {
         )
 }
 export {problemSolvedByUser}
+
+//7. all submission of a particular problem by a user
+async function submissionsProblem(req,res) {
+    //1.auth 
+    //2.
+    try{
+       const userId=req.user._id;
+       const problemId=req.params.id;
+       //
+      const ans=await Submission.find({userId,problemId});
+      //
+      if(ans.length==0){
+              return res.status(200)
+      .json(
+        new apiresponse(200,ans,"no submission")
+        )
+      }
+      return res.status(200)
+      .json(
+        new apiresponse(200,ans,"all submissions")
+      )
+    }
+    catch(err){
+        throw new apierror(400,err.message)
+    }
+}
+
+export {submissionsProblem}

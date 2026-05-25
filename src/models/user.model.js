@@ -27,10 +27,10 @@ const userSchema=new Schema({
         trim:true,
         index:true
     },
-    avatar:{
-        type:String,//cloudinary url
-        required:true,
-    },
+    // avatar:{
+    //     type:String,//cloudinary url
+    //     required:true,
+    // },
    age:{
     type:Number,
     min:6,
@@ -63,7 +63,7 @@ const userSchema=new Schema({
 )
 //mongoose methods;
 
-//password
+//password save
 userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
     this.password = await bcrypt.hash(this.password, 10);
@@ -102,5 +102,10 @@ userSchema.methods.generateRefreshToken=function(){
     }
    )
 }
-//
+//deleted user
+userSchema.post("findOneAndDelete",async function(doc){
+    if(doc){
+        await mongoose.model("Submission").deleteMany({userId:doc._id});
+    }
+})
 export const User=mongoose.model("User",userSchema)

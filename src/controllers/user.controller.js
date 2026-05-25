@@ -6,6 +6,7 @@ import validator from "validator"
 import {cloudinary_upload} from "../utils/cloudinary.js"
 import { redisClient } from "../db/redis.js";
 import jwt from "jsonwebtoken";
+import { Submission } from "../models/submission.model.js";
 
 async function generateAccessRefreshToken(id) {
     const user=await User.findById(id);
@@ -47,9 +48,9 @@ async function registerUser(req,res) {
         throw new apierror(400,"password is required")
     }
     //
-    if(!(validator.isEmail(email))){
-        throw new apierror(400,"Invalid email");
-    }
+    // if(!(validator.isEmail(email))){
+    //     throw new apierror(400,"Invalid email");
+    // }
     //
     const exiteduser=await User.findOne({
         $or:[{username},{email}]
@@ -59,19 +60,22 @@ async function registerUser(req,res) {
     }
     //
     //4.multer(midddleware)-->add-->req.files
-    const avatarlocalpath= req.files?.avatar[0]?.path;
-    if(!avatarlocalpath){
-        throw new apierror(400,"Avatar file is required")
-    }
-    //
-    const avatar= await cloudinary_upload(avatarlocalpath);
-    if(!avatar){
-    throw new apierror(400,"Avatar file is required")
-   }
+//     const avatarlocalpath = req.file?.path;
+//     console.log(req.body);
+//     console.log(req.file);
+//     console.log(avatarlocalpath);
+//     if(!avatarlocalpath){
+//         throw new apierror(400,"Avatar file is required")
+//     }
+//     //
+//     const avatar= await cloudinary_upload(avatarlocalpath);
+//     if(!avatar){
+//     throw new apierror(400,"Avatar file is missing")
+//    }
    //7.
    const user= await User.create({
     fullName,
-    avatar:avatar.url,
+    // avatar:avatar.url,
     email,
     password,
     username,
@@ -133,7 +137,7 @@ async function loginUser(req,res) {
      new apiresponse(
          200,
          {
-            user:loggedInUser,accessToken,refreshToken 
+            user:loggedInUser,
          },
          "User logged In Successfully"
    )
@@ -252,3 +256,25 @@ async function registerAdmin(req,res) {
    )
 }
 export {registerAdmin}
+
+//5.delete user
+async function deleteUser(req,res) {
+    //1.verify user
+    //2.deletion
+    try {
+        const userId=req.user._id;
+        await User.findByIdAndDelete(userId);
+        //delete submissions by user
+        await Submission.deleteMany({userId});
+        return res.status(200)
+        .json(
+            new apiresponse(200,{},"user deleted Successfully")
+        )
+    } catch (error) {
+        throw new apierror(400,"user not deleted");
+    }
+}
+export {deleteUser}
+
+//6. all submission of a particular problem by a user
+

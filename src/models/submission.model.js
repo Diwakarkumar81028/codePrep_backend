@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
+
 const submissionScehma=new mongoose.Schema(
     {
        userId:{
@@ -50,4 +51,6 @@ const submissionScehma=new mongoose.Schema(
     {timestamps:true}
 )
 
+//compound index
+submissionScehma.index({userId:1,problemId:1})
 export const Submission=mongoose.model("Submission",submissionScehma);

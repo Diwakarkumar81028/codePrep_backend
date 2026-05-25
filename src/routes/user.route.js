@@ -1,18 +1,16 @@
 import { Router } from "express";
-import { loginUser, registerUser,logoutUser,registerAdmin } from "../controllers/user.controller.js";
+import { loginUser, registerUser,logoutUser,registerAdmin,deleteUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { verifyAdmin } from "../middlewares/verifyadmin.middleware.js";
 const router=Router();
 //1.register
-router.route("/register").post(
-        upload.fields([
-        {
-            name:"avatar",
-            maxCount:1
-        },
-    ]),
-    registerUser)
+// router.route("/register").post(
+// //   upload.single("avatar"),
+// //   registerUser
+// // );
+
+router.route("/register").post(registerUser);
 
 //2.login
 router.route("/login").post(loginUser)
@@ -32,5 +30,17 @@ router.route("/admin/register").post(
     registerAdmin
 )
 
-//5.
+//5.delete user account
+router.route("/delete").post(verifyJWT,deleteUser)
+//6.
+router.route("/check").get(verifyJWT,(req,res)=>{
+
+    const reply={
+        firstName:req.user.fullName,
+        emailId:req.user.email,
+        _id:req.user._id
+    }
+    res.status(200)
+    .json({reply,message:"valid user"})
+})
 export default router;

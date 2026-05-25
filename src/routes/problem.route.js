@@ -2,7 +2,7 @@
 import { Router } from "express";
 import { verifyAdmin } from "../middlewares/verifyadmin.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createProblem, deleteProblem, updateProblem,getProblemById, getAllProblem, problemSolvedByUser } from "../controllers/problem.controller.js";
+import { createProblem, deleteProblem, updateProblem,getProblemById, getAllProblem, problemSolvedByUser, submissionsProblem } from "../controllers/problem.controller.js";
 
 
 // /api/v1/problem
@@ -27,4 +27,6 @@ router.route('/getall').get(verifyJWT,getAllProblem);
 //6.problem solved by user
 router.route("/solvedByUser").get(verifyJWT,problemSolvedByUser);
 
+//7.all submissions of a problem
+router.route("/submissions/:id").post(verifyJWT,submissionsProblem)
 export default router;
