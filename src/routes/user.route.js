@@ -32,12 +32,13 @@ router.route("/admin/register").post(
 
 //5.delete user account
 router.route("/delete").post(verifyJWT,deleteUser)
-//6.
+//6.check_auth
 router.route("/check").get(verifyJWT,(req,res)=>{
 
     const reply={
-        firstName:req.user.fullName,
+        fullName:req.user.fullName,
         emailId:req.user.email,
+        username=req.user.username,
         _id:req.user._id
     }
     res.status(200)
