@@ -38,9 +38,11 @@ router.route("/check").get(verifyJWT,(req,res)=>{
     const reply={
         fullName:req.user.fullName,
         emailId:req.user.email,
-        username=req.user.username,
+        username:req.user.username,
         _id:req.user._id
+        
     }
+    // console.log(req.user);
     res.status(200)
     .json({reply,message:"valid user"})
 })
