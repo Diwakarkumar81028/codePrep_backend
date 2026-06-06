@@ -39,8 +39,8 @@ router.route("/check").get(verifyJWT,(req,res)=>{
         fullName:req.user.fullName,
         emailId:req.user.email,
         username:req.user.username,
-        _id:req.user._id
-        
+        _id:req.user._id,
+        role:req.user.role,
     }
     // console.log(req.user);
     res.status(200)

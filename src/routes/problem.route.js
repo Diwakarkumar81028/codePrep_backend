@@ -28,5 +28,5 @@ router.route('/getall').get(verifyJWT,getAllProblem);
 router.route("/solvedByUser").get(verifyJWT,problemSolvedByUser);
 
 //7.all submissions of a problem
-router.route("/submissions/:id").post(verifyJWT,submissionsProblem)
+router.route("/submissions/:id").get(verifyJWT,submissionsProblem)
 export default router;

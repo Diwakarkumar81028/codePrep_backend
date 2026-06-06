@@ -183,16 +183,13 @@ async function getProblemById(req,res) {
     }
     //fetch
     const Dsaproblem=await Problem.findById(id).select(
-        "-problemCreator -hiddenTestCases"
+        "_id title description difficulty tags visibleTestCases startCode referenceSolution "
     );
     if(!Dsaproblem){
         throw new apierror(400,"Invalid problem id")
     }
     //res
-    return res.status(200)
-    .json(
-        new apiresponse(200,Dsaproblem,"Problem fetched successfully")
-    )
+  return res.status(200).send(Dsaproblem);
 
 }
 export{getProblemById}
@@ -248,16 +245,10 @@ async function submissionsProblem(req,res) {
        //
       const ans=await Submission.find({userId,problemId});
       //
-      if(ans.length==0){
-              return res.status(200)
-      .json(
-        new apiresponse(200,ans,"no submission")
-        )
-      }
-      return res.status(200)
-      .json(
-        new apiresponse(200,ans,"all submissions")
-      )
+        if(ans.length==0)
+        return  res.status(200).send("No Submission is persent");
+
+        return res.status(200).send(ans);
     }
     catch(err){
         throw new apierror(400,err.message)

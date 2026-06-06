@@ -15,11 +15,13 @@ async function submitProblem(req,res) {
         const userId=req.user._id;
         const problemId=req.params.id;
         //a.   
-        const {code,language}=req.body;
+        let {code,language}=req.body;
         if(!userId || !problemId || !code ||!language){
             throw new apierror(400,"some fields are missing")
         }
         //
+        if(language==='cpp')
+        language='c++'
         //b.fetch problem from db
         const problem=await Problem.findById(problemId);
          //
@@ -91,9 +93,19 @@ async function submitProblem(req,res) {
             }
         }
          //
-            return res.status(201).json(
-                new apiresponse(201,submittedResult,"solution submitted")
-            );
+            // return res.status(201).json(
+            //     new apiresponse(201,submittedResult,"solution submitted")
+            // );
+        
+          const accepted=(status=="accepted");
+          return res.status(201).json({
+            accepted,
+            totalTestCases:submittedResult.testCasesTotal,
+            passedTestCases:submittedResult.testCasesPassed,
+            runtime,
+            memory,
+
+          })
     }
     catch(err){
         throw new apierror(500,"error while submitting the problem");
@@ -110,7 +122,7 @@ async function runCode(req,res) {
         const userId=req.user._id;
         const problemId=req.params.id;
         //a.   
-        const {code,language}=req.body;
+        let {code,language}=req.body;
         if(!userId || !problemId || !code ||!language){
             throw new apierror(400,"some fields are missing")
         }
@@ -118,6 +130,8 @@ async function runCode(req,res) {
         //b.fetch problem from db
         const problem=await Problem.findById(problemId);
          //imp 
+        if(language==='cpp')
+        language='c++'
          //2.submit code on judge 0;  
         const languageId = getLanguageId(language);
        
@@ -139,12 +153,45 @@ async function runCode(req,res) {
         // console.log(testResult);
 
          //
-        return res.status(201).json(
-                new apiresponse(201,testResult,"code run...")
-            );
+        // return res.status(201).json(
+        //         new apiresponse(201,testResult,"code run...")
+        //     );
+
+   let testCasesPassed = 0;
+    let runtime = 0;
+    let memory = 0;
+    let status = true;
+    let errorMessage = null;
+
+    for(const test of testResult){
+        if(test.status.id==3){
+           testCasesPassed++;
+           runtime = runtime+parseFloat(test.time)
+           memory = Math.max(memory,test.memory);
+        }else{
+          if(test.status.id==4){
+            status = false
+            errorMessage = test.stderr
+          }
+          else{
+            status = false
+            errorMessage = test.stderr
+          }
+        }
     }
+
+   
+  
+   res.status(201).json({
+    success:status,
+    testCases: testResult,
+    runtime,
+    memory
+   });
+      
+   }
     catch(err){
-        throw new apierror(500,"error while submitting the problem");
+        throw new apierror(500,"error while running the code");
     }    
 }
 export {runCode}

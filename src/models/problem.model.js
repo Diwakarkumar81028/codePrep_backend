@@ -17,7 +17,7 @@ const problemSchema=new mongoose.Schema(
         },
         tags:{
             type:String,
-            enum:['Array','Linkedlist','Graph','Tree','Dp'],
+            enum:['array','linkedlist','graph','tree','dp'],
             required:true
         },
         visibleTestCases:[
